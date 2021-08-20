@@ -48,7 +48,9 @@ public class Application extends AbstractAuditingEntity implements Serializable 
         E_SIGNED,
         READY_TO_DISBURSE,
         DISBURSED,
-        NEW_REQUEST
+        NEW_REQUEST,
+        SUCCESSFUL,
+        RETURN
     }
 
     @Id

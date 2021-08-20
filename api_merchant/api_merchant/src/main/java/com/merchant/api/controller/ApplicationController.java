@@ -21,6 +21,7 @@ import com.merchant.api.service.ApplicationService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
@@ -74,14 +75,14 @@ public class ApplicationController {
     }
     
     @ApiOperation(value = "get data by order id", response = Application.class)
-    @GetMapping(value = "/test/getbyid")
+    @GetMapping(value = "/{orderId}")
     public ResponseEntity<?> getById(
             @ApiParam(value = "Order id from client", required = true)
-            @RequestParam(required = true, value = "orderId") String orderId) {
+            @PathVariable(required = true, value = "orderId") String orderId) {
         Application app = (Application) service.findByOrderId(orderId);
         log.debug("application created : {}", app);
         if(app == null) {
-            return new ResponseEntity("{\"message\":\"Data not found with order id : "+ orderId +".\"}", HttpStatus.OK);
+            return new ResponseEntity("{\"message\":\"Data not found with order id : "+ orderId +".\"}", HttpStatus.BAD_REQUEST);
         }
         
         return new ResponseEntity(app, HttpStatus.OK);
