@@ -80,7 +80,6 @@ public class ApplicationController {
             @ApiParam(value = "Order id from client", required = true)
             @PathVariable(required = true, value = "orderId") String orderId) {
         Application app = (Application) service.findByOrderId(orderId);
-        log.debug("application created : {}", app);
         if(app == null) {
             return new ResponseEntity("{\"message\":\"Data not found with order id : "+ orderId +".\"}", HttpStatus.BAD_REQUEST);
         }
