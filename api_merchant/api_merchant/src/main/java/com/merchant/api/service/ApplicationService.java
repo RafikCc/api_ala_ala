@@ -37,6 +37,7 @@ import com.merchant.api.model.payload.request.CustomerAddressReq;
 import com.merchant.api.model.payload.request.DocumentPhotoReq;
 import com.merchant.api.model.payload.request.OrderItemsReq;
 import com.merchant.api.model.payload.request.RelativeContactReq;
+import com.merchant.api.model.payload.response.HistoryResponse;
 import com.merchant.api.repository.AdditionalInfoRepo;
 import com.merchant.api.repository.ApplicationRepo;
 import com.merchant.api.repository.BankInfoRepo;
@@ -322,5 +323,33 @@ public class ApplicationService {
             result = e.getMessage();
         }
         return result;
-    } 
+    }
+    
+    public List<CustomerInfo> getCustByNoKtp(String noKtp, String noHp) {  
+        return customerInfoRepo.getByNoKtpAndNoHp(noKtp, noHp);
+    }
+    
+    public HistoryResponse getHistory(CustomerInfo customerInfo) {
+        List<OrderItems> itemses = orderItemsRepo.getHistoryByNoKtpAndNoHp(
+                customerInfo.getKtpNumber(), customerInfo.getPhoneNumber());
+        List<OrderItemsReq> itemsReqs = new ArrayList<>();
+        itemses.forEach(x -> {
+            OrderItemsReq itemsReq = new OrderItemsReq();
+            itemsReq.setItemId(x.getItemId());
+            itemsReq.setItemImageUrl(x.getItemImageUrl());
+            itemsReq.setItemName(x.getItemName());
+            itemsReq.setItemPrice(x.getItemPrice());
+            itemsReq.setItemQuantity(x.getItemQuantity());
+            itemsReq.setItemType(x.getItemType());
+            itemsReq.setItemUrl(x.getItemUrl());
+            itemsReq.setSellerBadge(x.getSellerBadge());
+            itemsReq.setSellerId(x.getSellerId());
+            itemsReq.setSellerName(x.getSellerName());
+            itemsReqs.add(itemsReq);
+        });
+        HistoryResponse response = new HistoryResponse(customerInfo.getFirstName() 
+                +" "+ customerInfo.getLastName(), 
+                "GOLD", itemsReqs);
+        return response;
+    }
 }
