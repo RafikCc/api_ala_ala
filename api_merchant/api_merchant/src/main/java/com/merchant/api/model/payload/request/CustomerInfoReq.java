@@ -11,19 +11,19 @@ import lombok.ToString;
 @Getter
 @ToString
 public class CustomerInfoReq {
-	
-	private Date dateOfBirth;
-	private Integer dependentNumber;
-	private Boolean ektpFlag;
-	private String emailAddress;
-	private String firstName;
-	private String lastName;
-	private String genderType;
-	private String ktpNumber;
-	private String lastEducation;
-	private String maritalStatus;
-	private String motherName;
-	private String phoneNumber;
-	private String birthplaceCode;
-	private List<CustomerAddressReq> customerAddress;
+
+    private Date dateOfBirth;
+    private Integer dependentNumber;
+    private Boolean ektpFlag;
+    private String emailAddress;
+    private String firstName;
+    private String lastName;
+    private String genderType;
+    private String ktpNumber;
+    private String lastEducation;
+    private String maritalStatus;
+    private String motherName;
+    private String phoneNumber;
+    private String birthplaceCode;
+    private List<CustomerAddressReq> customerAddress;
 }

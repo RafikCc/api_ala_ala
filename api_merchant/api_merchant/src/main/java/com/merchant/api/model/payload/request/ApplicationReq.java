@@ -10,13 +10,13 @@ import lombok.ToString;
 @Getter
 @ToString
 public class ApplicationReq {
-	
-	private AdditionalInfoReq additionalInfo;
-	private BankInfoReq bankInfo;
-	private CustomerInfoReq customerInfo;
-	private List<DocumentPhotoReq> documentPhoto;
-	private EmploymentInfoReq employmentInfo;
-	private InstallmentReq installment;
-	private OrderReq order;
-	private List<RelativeContactReq> relativeContact;
+
+    private AdditionalInfoReq additionalInfo;
+    private BankInfoReq bankInfo;
+    private CustomerInfoReq customerInfo;
+    private List<DocumentPhotoReq> documentPhoto;
+    private EmploymentInfoReq employmentInfo;
+    private InstallmentReq installment;
+    private OrderReq order;
+    private List<RelativeContactReq> relativeContact;
 }

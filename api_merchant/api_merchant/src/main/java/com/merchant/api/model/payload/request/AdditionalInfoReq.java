@@ -8,5 +8,6 @@ import lombok.ToString;
 @Getter
 @ToString
 public class AdditionalInfoReq {
-	private String offerCode;
+
+    private String offerCode;
 }

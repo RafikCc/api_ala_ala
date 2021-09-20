@@ -31,21 +31,21 @@ import lombok.ToString;
 @Setter
 @DynamicUpdate
 public class Installment extends AbstractAuditingEntity implements Serializable {
-	
-	private static final long serialVersionUID = 1L;
-	
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "id", nullable = false, unique = true)
-	private Long installmentId;
-	
-	@Column(name = "amount")
-	private Double amount;
-	
-	@Column(name = "month_installment")
-	private Integer monthInstallment;
-	
-	@JoinColumn(name = "app_id", referencedColumnName = "id")
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
-	private Application application;
+
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false, unique = true)
+    private Long installmentId;
+
+    @Column(name = "amount")
+    private Double amount;
+
+    @Column(name = "month_installment")
+    private Integer monthInstallment;
+
+    @JoinColumn(name = "app_id", referencedColumnName = "id")
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    private Application application;
 }

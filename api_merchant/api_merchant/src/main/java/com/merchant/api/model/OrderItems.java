@@ -36,7 +36,7 @@ import lombok.ToString;
 public class OrderItems extends AbstractAuditingEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    
+
     public enum StatusItem {
         RUSAK,
         SALAH_BARANG,
@@ -79,7 +79,7 @@ public class OrderItems extends AbstractAuditingEntity implements Serializable {
 
     @Column(name = "seller_id", length = 100)
     private String sellerId;
-    
+
     @Column(name = "status_item", length = 50)
     @Enumerated(EnumType.STRING)
     private StatusItem status;

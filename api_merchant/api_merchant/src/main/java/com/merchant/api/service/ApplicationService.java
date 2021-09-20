@@ -1,5 +1,6 @@
 package com.merchant.api.service;
 
+import com.google.gson.Gson;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -37,6 +38,7 @@ import com.merchant.api.model.payload.request.CustomerAddressReq;
 import com.merchant.api.model.payload.request.DocumentPhotoReq;
 import com.merchant.api.model.payload.request.OrderItemsReq;
 import com.merchant.api.model.payload.request.RelativeContactReq;
+import com.merchant.api.model.payload.response.ErrorResponse;
 import com.merchant.api.model.payload.response.HistoryResponse;
 import com.merchant.api.repository.AdditionalInfoRepo;
 import com.merchant.api.repository.ApplicationRepo;
@@ -49,11 +51,16 @@ import com.merchant.api.repository.InstallmentRepo;
 import com.merchant.api.repository.OrderItemsRepo;
 import com.merchant.api.repository.OrderRepo;
 import com.merchant.api.repository.RelativeContactRepo;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 
 @Service
 @Transactional(readOnly = false, rollbackFor = {Exception.class})
 public class ApplicationService {
-	
+
     private final Logger log = LoggerFactory.getLogger(getClass());
 
     @Autowired
@@ -88,78 +95,85 @@ public class ApplicationService {
 
     @Autowired
     private RelativeContactRepo relativeContactRepo;
-	
+
     public String saveAll(ApplicationReq request) {
-        String result = "Success";
-        Application application = new Application();
-        application.setConsentTimeStamp(new Date());
-        application.setExpiredTime(new Date(new Date().getTime() + 86400000));
-        application.setOrderId("ORDER" + new SimpleDateFormat("MMYY").format(new Date()) 
-                        + "00" + new SimpleDateFormat("HH").format(new Date()));
-        application.setStatus(Status.NEW_REQUEST);
         try {
-                applicationRepo.save(application);
-        } catch (Exception e) {
-                // TODO: handle exception
-                log.debug("error save application : {}", e.getMessage());
-                result = e.getMessage();
-        }
+            String result = "Success";
+            Application application = new Application();
+            application.setConsentTimeStamp(new Date());
+            application.setExpiredTime(new Date(new Date().getTime() + 86400000));
+            application.setOrderId(("ORDER" + new SimpleDateFormat("MMYY").format(new Date())
+                    + ThreadLocalRandom.current().nextInt()).replace("-", ""));
+            application.setStatus(Status.NEW_REQUEST);
+            applicationRepo.save(application);
+            // set param untuk request ke api empower submission
+            Map<String, Object> empowerParam = new HashMap<>();
+            empowerParam.put("orderId", application.getOrderId());
+            empowerParam.put("expiredTime", application.getExpiredTime());
+            empowerParam.put("consentTimeStamp", application.getConsentTimeStamp());
 
-        AdditionalInfo additionalInfo = new AdditionalInfo();
-        additionalInfo.setCustomerRegistrationTime(new Date(new Date().getTime() - (158*60*60*1000)));
-        additionalInfo.setNumberOfTransaction(10);
-        additionalInfo.setOfferCode(request.getAdditionalInfo().getOfferCode());
-        additionalInfo.setOtpVerificationTime(new Date(additionalInfo.getCustomerRegistrationTime().getTime() + 86400000));
-        additionalInfo.setVolumeOfTransaction(new Double(10000000));
-        additionalInfo.setUserId(new Long(194));
-        additionalInfo.setApplication(application);
-        try {
-                additionalInfoRepo.save(additionalInfo);
-        } catch (Exception e) {
-                // TODO: handle exception
-                log.debug("error save additional info : {}", e.getMessage());
-                result = e.getMessage();
-        }
+            AdditionalInfo additionalInfo = new AdditionalInfo();
+            additionalInfo.setCustomerRegistrationTime(new Date(new Date().getTime() - (158 * 60 * 60 * 1000)));
+            additionalInfo.setNumberOfTransaction(10);
+            additionalInfo.setOfferCode(request.getAdditionalInfo().getOfferCode());
+            additionalInfo.setOtpVerificationTime(new Date(additionalInfo.getCustomerRegistrationTime().getTime() + 86400000));
+            additionalInfo.setVolumeOfTransaction(new Double(10000000));
+            additionalInfo.setUserId(new Long(194));
+            additionalInfo.setApplication(application);
+            additionalInfoRepo.save(additionalInfo);
+            // set param untuk request ke api empower submission
+            Map<String, Object> empowerAddInfo = new HashMap<>();
+            empowerAddInfo.put("offerCode", additionalInfo.getOfferCode());
+            empowerAddInfo.put("userId", additionalInfo.getUserId());
+            empowerAddInfo.put("otpVerifiedTime", additionalInfo.getOtpVerificationTime());
+            empowerAddInfo.put("customerRegistrationTime", additionalInfo.getCustomerRegistrationTime());
+            empowerAddInfo.put("numberOfTransaction", additionalInfo.getNumberOfTransaction());
+            empowerAddInfo.put("volumeOfTransaction", additionalInfo.getVolumeOfTransaction().intValue());
+            empowerParam.put("additionalInfo", empowerAddInfo);
 
-        BankInfo bankInfo = new BankInfo();
-        bankInfo.setBankCode(request.getBankInfo().getBankCode());
-        bankInfo.setBankName(request.getBankInfo().getBankName());
-        bankInfo.setAccountNumber(request.getBankInfo().getAccountNumber());
-        bankInfo.setAccountName(request.getBankInfo().getAccountName());
-        bankInfo.setApplication(application);
-        try {
-                bankInfoRepo.save(bankInfo);
-        } catch (Exception e) {
-                // TODO: handle exception
-                log.debug("error save bank info : {}", e.getMessage());
-                result = e.getMessage();
-        }
+            BankInfo bankInfo = new BankInfo();
+            bankInfo.setBankCode(request.getBankInfo().getBankCode());
+            bankInfo.setBankName(request.getBankInfo().getBankName());
+            bankInfo.setAccountNumber(request.getBankInfo().getAccountNumber());
+            bankInfo.setAccountName(request.getBankInfo().getAccountName());
+            bankInfo.setApplication(application);
+            bankInfoRepo.save(bankInfo);
+            empowerParam.put("bankInfo", request.getBankInfo());
 
-        CustomerInfo customerInfo = new CustomerInfo();
-        customerInfo.setDateOfBirth(request.getCustomerInfo().getDateOfBirth());
-        customerInfo.setDependentNumber(request.getCustomerInfo().getDependentNumber());
-        customerInfo.setEktpFlag(request.getCustomerInfo().getEktpFlag());
-        customerInfo.setEmailAddress(request.getCustomerInfo().getEmailAddress());
-        customerInfo.setFirstName(request.getCustomerInfo().getFirstName());
-        customerInfo.setLastName(request.getCustomerInfo().getLastName());
-        customerInfo.setGenderType(Gender.valueOf(request.getCustomerInfo().getGenderType()));
-        customerInfo.setKtpNumber(request.getCustomerInfo().getKtpNumber());
-        customerInfo.setLastEducation(LastEducation.valueOf(request.getCustomerInfo().getLastEducation()));
-        customerInfo.setMaritalStatus(MaritalStatus.valueOf(request.getCustomerInfo().getMaritalStatus()));
-        customerInfo.setMotherName(request.getCustomerInfo().getMotherName());
-        customerInfo.setPhoneNumber(request.getCustomerInfo().getPhoneNumber());
-        customerInfo.setBirthplaceCode(request.getCustomerInfo().getBirthplaceCode());
-        customerInfo.setApplication(application);
-        try {
-                customerInfoRepo.save(customerInfo);
-        } catch (Exception e) {
-                // TODO: handle exception
-                log.debug("error save cust info : {}", e.getMessage());
-                result = e.getMessage();
-        }
+            CustomerInfo customerInfo = new CustomerInfo();
+            customerInfo.setDateOfBirth(request.getCustomerInfo().getDateOfBirth());
+            customerInfo.setDependentNumber(request.getCustomerInfo().getDependentNumber());
+            customerInfo.setEktpFlag(request.getCustomerInfo().getEktpFlag());
+            customerInfo.setEmailAddress(request.getCustomerInfo().getEmailAddress());
+            customerInfo.setFirstName(request.getCustomerInfo().getFirstName());
+            customerInfo.setLastName(request.getCustomerInfo().getLastName());
+            customerInfo.setGenderType(Gender.valueOf(request.getCustomerInfo().getGenderType()));
+            customerInfo.setKtpNumber(request.getCustomerInfo().getKtpNumber());
+            customerInfo.setLastEducation(LastEducation.valueOf(request.getCustomerInfo().getLastEducation()));
+            customerInfo.setMaritalStatus(MaritalStatus.valueOf(request.getCustomerInfo().getMaritalStatus()));
+            customerInfo.setMotherName(request.getCustomerInfo().getMotherName());
+            customerInfo.setPhoneNumber(request.getCustomerInfo().getPhoneNumber());
+            customerInfo.setBirthplaceCode(request.getCustomerInfo().getBirthplaceCode());
+            customerInfo.setApplication(application);
+            customerInfoRepo.save(customerInfo);
+            Map<String, Object> empowerCustInfo = new HashMap<>();
+            empowerCustInfo.put("emailAddress", customerInfo.getEmailAddress());
+            empowerCustInfo.put("phoneNumber", customerInfo.getPhoneNumber());
+            empowerCustInfo.put("ktpNumber", customerInfo.getKtpNumber());
+            empowerCustInfo.put("firstName", customerInfo.getFirstName());
+            empowerCustInfo.put("lastName", customerInfo.getLastName());
+            empowerCustInfo.put("birthplaceCode", customerInfo.getBirthplaceCode());
+            empowerCustInfo.put("dateOfBirth", customerInfo.getDateOfBirth());
+            empowerCustInfo.put("genderType", customerInfo.getGenderType());
+            empowerCustInfo.put("motherName", customerInfo.getMotherName());
+            empowerCustInfo.put("lastEducation", customerInfo.getLastEducation());
+            empowerCustInfo.put("maritalStatus", customerInfo.getMaritalStatus());
+            empowerCustInfo.put("dependentNumber", customerInfo.getDependentNumber());
+            empowerCustInfo.put("ektpFlag", customerInfo.getEktpFlag() ? 1:0);
 
-        List<CustomerAddress> listCustAddress = new ArrayList<CustomerAddress>();
-        for(CustomerAddressReq address:request.getCustomerInfo().getCustomerAddress()) {
+            List<CustomerAddress> listCustAddress = new ArrayList<>();
+            List<Object> paramCustAdd = new ArrayList<>();
+            request.getCustomerInfo().getCustomerAddress().forEach(address -> {
                 CustomerAddress customerAddress = new CustomerAddress();
                 customerAddress.setAddressType(AddressType.valueOf(address.getAddressType()));
                 customerAddress.setCityCode(address.getCityCode());
@@ -172,81 +186,65 @@ public class ApplicationService {
                 customerAddress.setCustInfoId(customerInfo);
 
                 listCustAddress.add(customerAddress);
-        }
-        try {
-                customerAddressRepo.saveAll(listCustAddress);
-        } catch (Exception e) {
-                // TODO: handle exception
-                log.debug("error save cust address : {}", e.getMessage());
-                result = e.getMessage();
-        }
+                paramCustAdd.add(address);
+            });
+            customerAddressRepo.saveAll(listCustAddress);
+            empowerCustInfo.put("customerAddress", paramCustAdd);
+            empowerParam.put("customerInfo", empowerCustInfo);
 
-        List<DocumentPhoto> documentPhotos = new ArrayList<DocumentPhoto>();
-        for(DocumentPhotoReq req:request.getDocumentPhoto()) {
+            List<DocumentPhoto> documentPhotos = new ArrayList<>();
+            List<Object> paramDocPhoto = new ArrayList<>();
+            request.getDocumentPhoto().forEach(req -> {
                 DocumentPhoto photo = new DocumentPhoto();
                 photo.setDocumentType(DocumentType.valueOf(req.getDocumentType()));
                 photo.setDocumentUrl(req.getDocumentUrl());
                 photo.setApplication(application);
 
                 documentPhotos.add(photo);
-        }
-        try {
-                documentPhotoRepo.saveAll(documentPhotos);
-        } catch (Exception e) {
-                // TODO: handle exception
-                log.debug("error save doc photo : {}", e.getMessage());
-                result = e.getMessage();
-        }
+                paramDocPhoto.add(req);
+            });
+            documentPhotoRepo.saveAll(documentPhotos);
+            empowerParam.put("documentPhoto", paramDocPhoto);
 
-        EmploymentInfo employmentInfo = new EmploymentInfo();
-        employmentInfo.setEmploymentType(EmploymentType.valueOf(request.getEmploymentInfo().getEmploymentType()));
-        employmentInfo.setIndustryType(IndustryType.valueOf(request.getEmploymentInfo().getIndustryType()));
-        employmentInfo.setLengthOfEmployment(request.getEmploymentInfo().getLengthOfEmployment());
-        employmentInfo.setMonthlyIncome(request.getEmploymentInfo().getMonthlyIncome());
-        employmentInfo.setOtherInstallment(request.getEmploymentInfo().getOtherInstallment());
-        employmentInfo.setProfession(Profession.valueOf(request.getEmploymentInfo().getProfession()));
-        employmentInfo.setApplication(application);
-        try {
-                employmentInfoRepo.save(employmentInfo);
-        } catch (Exception e) {
-                // TODO: handle exception
-                log.debug("error save employment info : {}", e.getMessage());
-                result = e.getMessage();
-        }
+            EmploymentInfo employmentInfo = new EmploymentInfo();
+            employmentInfo.setEmploymentType(EmploymentType.valueOf(request.getEmploymentInfo().getEmploymentType()));
+            employmentInfo.setIndustryType(IndustryType.valueOf(request.getEmploymentInfo().getIndustryType()));
+            employmentInfo.setLengthOfEmployment(request.getEmploymentInfo().getLengthOfEmployment());
+            employmentInfo.setMonthlyIncome((double) request.getEmploymentInfo().getMonthlyIncome());
+            employmentInfo.setOtherInstallment((double) request.getEmploymentInfo().getOtherInstallment());
+            employmentInfo.setProfession(Profession.valueOf(request.getEmploymentInfo().getProfession()));
+            employmentInfo.setCompanyName(request.getEmploymentInfo().getCompanyName());
+            employmentInfo.setApplication(application);
+            employmentInfoRepo.save(employmentInfo);
+            empowerParam.put("employmentInfo", request.getEmploymentInfo());
 
-        Installment installment = new Installment();
-        installment.setMonthInstallment(request.getInstallment().getMonthInstallment());
-        installment.setAmount(request.getInstallment().getAmount());
-        installment.setApplication(application);
-        try {
-                installmentRepo.save(installment);
-        } catch (Exception e) {
-                // TODO: handle exception
-                log.debug("error save employment info : {}", e.getMessage());
-                result = e.getMessage();
-        }
+            Installment installment = new Installment();
+            installment.setMonthInstallment(request.getInstallment().getMonthInstallment());
+            installment.setAmount((double) request.getInstallment().getAmount());
+            installment.setApplication(application);
+            installmentRepo.save(installment);
+            empowerParam.put("installment", request.getInstallment());
 
-        Orders order = new Orders();
-        order.setInvoiceNumber("INV" + new SimpleDateFormat("MMYY").format(new Date()) 
-                        + "00" + new SimpleDateFormat("HH").format(new Date()));
-        order.setShippingAddress(request.getOrder().getShippingAddress());
-        order.setTotalPrice(request.getOrder().getTotalPrice());
-        order.setApplication(application);
-        try {
-                orderRepo.save(order);
-        } catch (Exception e) {
-                // TODO: handle exception
-                log.debug("error save order : {}", e.getMessage());
-                result = e.getMessage();
-        }
+            Orders order = new Orders();
+            order.setInvoiceNumber(("INV" + new SimpleDateFormat("MMYY").format(new Date())
+                    + ThreadLocalRandom.current().nextInt()).replace("-", ""));
+            order.setShippingAddress(request.getOrder().getShippingAddress());
+            order.setTotalPrice((double) request.getOrder().getTotalPrice());
+            order.setApplication(application);
+            orderRepo.save(order);
+            Map<String, Object> empowerOrder = new HashMap<>();
+            empowerOrder.put("invoiceNumber", order.getInvoiceNumber());
+            empowerOrder.put("shippingAddress", order.getShippingAddress());
+            empowerOrder.put("totalPrice", order.getTotalPrice().intValue());
 
-        List<OrderItems> items = new ArrayList<OrderItems>();
-        for(OrderItemsReq req:request.getOrder().getItems()) {
+            List<OrderItems> items = new ArrayList<>();
+            List<Object> paramItems = new ArrayList<>();
+            request.getOrder().getItems().forEach((req) -> {
                 OrderItems oi = new OrderItems();
                 oi.setItemId(req.getItemId());
                 oi.setItemImageUrl(req.getItemImageUrl());
                 oi.setItemName(req.getItemName());
-                oi.setItemPrice(req.getItemPrice());
+                oi.setItemPrice((double) req.getItemPrice());
                 oi.setItemQuantity(req.getItemQuantity());
                 oi.setItemType(req.getItemType());
                 oi.setItemUrl(req.getItemUrl());
@@ -256,17 +254,15 @@ public class ApplicationService {
                 oi.setOrder(order);
 
                 items.add(oi);
-        }
-        try {
-                orderItemsRepo.saveAll(items);
-        } catch (Exception e) {
-                // TODO: handle exception
-                log.debug("error save order items : {}", e.getMessage());
-                result = e.getMessage();
-        }
+                paramItems.add(req);
+            });
+            orderItemsRepo.saveAll(items);
+            empowerOrder.put("items", paramItems);
+            empowerParam.put("order", empowerOrder);
 
-        List<RelativeContact> contacts = new ArrayList<RelativeContact>();
-        for(RelativeContactReq req:request.getRelativeContact()) {
+            List<RelativeContact> contacts = new ArrayList<>();
+            List<Object> paramContacts = new ArrayList<>();
+            request.getRelativeContact().forEach((req) -> {
                 RelativeContact contact = new RelativeContact();
                 contact.setRelativeName(req.getRelativeName());
                 contact.setRelativePhone(req.getRelativePhone());
@@ -274,22 +270,31 @@ public class ApplicationService {
                 contact.setApplication(application);
 
                 contacts.add(contact);
-        }
-        try {
-                relativeContactRepo.saveAll(contacts);
+                paramContacts.add(req);
+            });
+            relativeContactRepo.saveAll(contacts);
+            empowerParam.put("relativeContact", paramContacts);
+            log.debug("param empower : {}", new Gson().toJson(empowerParam));
+            // hit api empower application submission
+            EmpowerApiService apiService = new EmpowerApiService();
+            String token = apiService.getToken("empower", "empower123", 
+                    "http://localhost:8083/api/v1/authenticate");
+            ResponseEntity res = apiService
+                    .excute("http://localhost:8083/api/v1/applications", new Gson().toJson(empowerParam), 
+                            HttpMethod.POST, String.class, new ErrorResponse(), token);
+            log.debug("response empower : {}", res);
+
+            return result;
         } catch (Exception e) {
-                // TODO: handle exception
-                log.debug("error save relative contact : {}", e.getMessage());
-                result = e.getMessage();
+            return e.getMessage();
         }
-        return result;
     }
-    
+
     public Application findByOrderId(String orderId) {
         return applicationRepo.findByOrderId(orderId);
     }
-    
-    public String updateDeviceReturn(Application app, List<OrderItemsReq> items, 
+
+    public String updateDeviceReturn(Application app, List<OrderItemsReq> items,
             String statusItem) {
         String result = "success";
         try {
@@ -310,11 +315,11 @@ public class ApplicationService {
             return result;
         }
     }
-    
+
     private OrderItems findOrderItemByApplicationAndItemId(Long appId, String itemId) {
         return orderItemsRepo.findByAppIdAndOrderItem(appId, itemId);
     }
-    
+
     public String saveApp(Application app) {
         String result = "success";
         try {
@@ -324,11 +329,11 @@ public class ApplicationService {
         }
         return result;
     }
-    
-    public List<CustomerInfo> getCustByNoKtp(String noKtp, String noHp) {  
+
+    public List<CustomerInfo> getCustByNoKtp(String noKtp, String noHp) {
         return customerInfoRepo.getByNoKtpAndNoHp(noKtp, noHp);
     }
-    
+
     public HistoryResponse getHistory(CustomerInfo customerInfo) {
         List<OrderItems> itemses = orderItemsRepo.getHistoryByNoKtpAndNoHp(
                 customerInfo.getKtpNumber(), customerInfo.getPhoneNumber());
@@ -338,7 +343,7 @@ public class ApplicationService {
             itemsReq.setItemId(x.getItemId());
             itemsReq.setItemImageUrl(x.getItemImageUrl());
             itemsReq.setItemName(x.getItemName());
-            itemsReq.setItemPrice(x.getItemPrice());
+            itemsReq.setItemPrice(x.getItemPrice().intValue());
             itemsReq.setItemQuantity(x.getItemQuantity());
             itemsReq.setItemType(x.getItemType());
             itemsReq.setItemUrl(x.getItemUrl());
@@ -347,8 +352,8 @@ public class ApplicationService {
             itemsReq.setSellerName(x.getSellerName());
             itemsReqs.add(itemsReq);
         });
-        HistoryResponse response = new HistoryResponse(customerInfo.getFirstName() 
-                +" "+ customerInfo.getLastName(), 
+        HistoryResponse response = new HistoryResponse(customerInfo.getFirstName()
+                + " " + customerInfo.getLastName(),
                 "GOLD", itemsReqs);
         return response;
     }

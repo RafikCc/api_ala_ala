@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @ToString
 public class DocumentPhotoReq {
-	
-	private String documentType;
-	private String documentUrl;
+
+    private String documentType;
+    private String documentUrl;
 }

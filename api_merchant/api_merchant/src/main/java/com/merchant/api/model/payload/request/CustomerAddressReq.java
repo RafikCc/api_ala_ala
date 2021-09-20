@@ -8,8 +8,8 @@ import lombok.ToString;
 @Getter
 @ToString
 public class CustomerAddressReq {
-	
-	private String addressType;
+
+    private String addressType;
     private String streetAddress;
     private String cityCode;
     private String districtCode;

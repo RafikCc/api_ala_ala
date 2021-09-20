@@ -72,13 +72,13 @@ public class Application extends AbstractAuditingEntity implements Serializable 
     @Column(name = "status", length = 255)
     @Enumerated(EnumType.STRING)
     private Status status;
-    
+
     @Column(name = "down_payment_amount")
     private Double downPaymentAmount;
-    
+
     @Column(name = "dp_status_payment", length = 5)
     private String dpStatusPayment;
-    
+
     @Column(name = "dp_payment_expired_date")
     @Temporal(TemporalType.TIMESTAMP)
     private Date dpPaymentExpiredDate;

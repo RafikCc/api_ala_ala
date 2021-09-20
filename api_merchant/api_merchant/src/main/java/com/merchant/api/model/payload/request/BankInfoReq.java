@@ -8,9 +8,9 @@ import lombok.ToString;
 @Getter
 @ToString
 public class BankInfoReq {
-	
-	private String bankCode;
-	private String bankName;
-	private Long accountNumber;
-	private String accountName;
+
+    private String bankCode;
+    private String bankName;
+    private Long accountNumber;
+    private String accountName;
 }

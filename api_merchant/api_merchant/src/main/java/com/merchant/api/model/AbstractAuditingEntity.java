@@ -31,6 +31,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Setter
 @ToString
 public abstract class AbstractAuditingEntity {
+
     @CreatedBy
     @Column(name = "created_by", updatable = false, length = 50)
     @DiffIgnore

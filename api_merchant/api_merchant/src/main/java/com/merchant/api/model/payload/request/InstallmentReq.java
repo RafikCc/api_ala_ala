@@ -9,6 +9,6 @@ import lombok.ToString;
 @ToString
 public class InstallmentReq {
 
-	private Double amount;
-	private Integer monthInstallment;
+    private Integer amount;
+    private Integer monthInstallment;
 }

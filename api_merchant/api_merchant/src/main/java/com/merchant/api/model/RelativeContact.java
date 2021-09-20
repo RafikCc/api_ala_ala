@@ -33,36 +33,36 @@ import lombok.ToString;
 @Setter
 @DynamicUpdate
 public class RelativeContact extends AbstractAuditingEntity implements Serializable {
-	
-	private static final long serialVersionUID = 1L;
-	
-	public enum RelativeRelation {
-        SPOUSE, 
-        FATHER, 
-        MOTHER, 
-        BROTHER, 
-        SISTER, 
-        SON, 
-        DAUGHTER, 
+
+    private static final long serialVersionUID = 1L;
+
+    public enum RelativeRelation {
+        SPOUSE,
+        FATHER,
+        MOTHER,
+        BROTHER,
+        SISTER,
+        SON,
+        DAUGHTER,
         OTHER_RELATIVE
     }
-	
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "id", nullable = false, unique = true)
-	private Long relativeContactId;
-	
-	@Column(name = "relative_name", length = 100)
-	private String relativeName;
-	
-	@Column(name = "relative_phone", length = 20)
-	private String relativePhone;
-	
-	@Column(name = "relative_relation", length = 50)
-	@Enumerated(EnumType.STRING)
-	private RelativeRelation relativeRelation;
-	
-	@JoinColumn(name = "app_id", referencedColumnName = "id")
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
-	private Application application;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false, unique = true)
+    private Long relativeContactId;
+
+    @Column(name = "relative_name", length = 100)
+    private String relativeName;
+
+    @Column(name = "relative_phone", length = 20)
+    private String relativePhone;
+
+    @Column(name = "relative_relation", length = 50)
+    @Enumerated(EnumType.STRING)
+    private RelativeRelation relativeRelation;
+
+    @JoinColumn(name = "app_id", referencedColumnName = "id")
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    private Application application;
 }

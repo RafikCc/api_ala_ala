@@ -33,46 +33,46 @@ import lombok.ToString;
 @Getter
 @Setter
 @DynamicUpdate
-public class CustomerAddress extends AbstractAuditingEntity  implements Serializable {
-	
-	private static final long serialVersionUID = 1L;
-	
-	public enum AddressType {
+public class CustomerAddress extends AbstractAuditingEntity implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    public enum AddressType {
         PERMANENT, CONTRACT
     }
-	
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "id", nullable = false, unique = true)
-	private Long custAdressId;
-	
-	@JoinColumn(name = "cust_info_id", referencedColumnName = "id")
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false, unique = true)
+    private Long custAdressId;
+
+    @JoinColumn(name = "cust_info_id", referencedColumnName = "id")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private CustomerInfo custInfoId;
-    
+
     @Column(name = "address_type", length = 50)
     @Enumerated(EnumType.STRING)
     private AddressType addressType;
-    
+
     @Column(name = "street_address")
     @Lob
     private String streetAddress;
-    
+
     @Column(name = "city_code", length = 20)
     private String cityCode;
-    
+
     @Column(name = "district_code", length = 20)
     private String districtCode;
-    
+
     @Column(name = "village_code", length = 20)
     private String villageCode;
-    
+
     @Column(name = "rt_number", length = 3)
     private String rtNumber;
-    
+
     @Column(name = "rw_number", length = 3)
     private String rwNumber;
-    
+
     @Column(name = "zipcode", length = 5)
     private String zipcode;
 }

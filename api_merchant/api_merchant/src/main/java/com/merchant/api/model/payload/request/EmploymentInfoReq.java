@@ -8,11 +8,12 @@ import lombok.ToString;
 @Getter
 @ToString
 public class EmploymentInfoReq {
-	
-	private String employmentType;
-	private String industryType;
-	private Integer lengthOfEmployment;
-	private Double monthlyIncome;
-	private Double otherInstallment;
-	private String profession;
+
+    private String employmentType;
+    private String industryType;
+    private Integer lengthOfEmployment;
+    private Integer monthlyIncome;
+    private Integer otherInstallment;
+    private String profession;
+    private String companyName;
 }

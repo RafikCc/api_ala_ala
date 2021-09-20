@@ -9,7 +9,7 @@ import lombok.ToString;
 @ToString
 public class RelativeContactReq {
 
-	private String relativeName;
-	private String relativePhone;
-	private String relativeRelation;
+    private String relativeName;
+    private String relativePhone;
+    private String relativeRelation;
 }

@@ -35,35 +35,35 @@ import lombok.ToString;
 @DynamicUpdate
 public class AdditionalInfo extends AbstractAuditingEntity implements Serializable {
 
-	private static final long serialVersionUID = 1L;
-	
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "id", nullable = false, unique = true)
-	private Long additionalInfoId;
-	
-	@Column(name = "customer_registration_time")
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date customerRegistrationTime;
-	
-	@Column(name = "number_of_transaction")
-	private Integer numberOfTransaction;
-	
-	@Column(name = "offer_code", length = 100)
-	private String offerCode;
-	
-	@Column(name = "otp_verification_time")
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date otpVerificationTime;
-	
-	@Column(name = "user_id")
-	private Long userId;
-	
-	@Column(name = "volume_of_transaction")
-	private Double volumeOfTransaction;
-	
-	@JoinColumn(name = "app_id", referencedColumnName = "id")
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
-	private Application application;
-	
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false, unique = true)
+    private Long additionalInfoId;
+
+    @Column(name = "customer_registration_time")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date customerRegistrationTime;
+
+    @Column(name = "number_of_transaction")
+    private Integer numberOfTransaction;
+
+    @Column(name = "offer_code", length = 100)
+    private String offerCode;
+
+    @Column(name = "otp_verification_time")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date otpVerificationTime;
+
+    @Column(name = "user_id")
+    private Long userId;
+
+    @Column(name = "volume_of_transaction")
+    private Double volumeOfTransaction;
+
+    @JoinColumn(name = "app_id", referencedColumnName = "id")
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    private Application application;
+
 }

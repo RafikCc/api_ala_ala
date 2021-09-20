@@ -10,8 +10,8 @@ import lombok.ToString;
 @Getter
 @ToString
 public class OrderReq {
-	
-	private String shippingAddress;
-	private Double totalPrice;
-	private List<OrderItemsReq> items;
+
+    private String shippingAddress;
+    private Integer totalPrice;
+    private List<OrderItemsReq> items;
 }
