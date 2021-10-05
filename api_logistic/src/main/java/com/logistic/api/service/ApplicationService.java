@@ -18,6 +18,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,8 +48,8 @@ public class ApplicationService {
             application.setWeight(data.getWeight());
             application.setWidth(data.getWidth());
             application.setStatus(TrxApplication.Status.REQUEST_PICKUP);
-            String noResi = "R"+ new SimpleDateFormat("ddMMyy").format(new Date()) + "00" +
-                    new SimpleDateFormat("HHmmss").format(new Date());
+            String noResi = ("R"+ new SimpleDateFormat("ddMMyy").format(new Date()) 
+                    + ThreadLocalRandom.current().nextInt()).replace("-", "");
             application.setNoResi(noResi);
             application.setTransactionId(data.getTransactionId());
             application.setOrderNo(data.getOrderId());
@@ -90,7 +91,7 @@ public class ApplicationService {
             response.setOrderId(application.getOrderNo());
             response.setStatusRequest(application.getStatus().toString());
             response.setTo(application.getAddressTo());
-            response.setTotalPrice(application.getTotalPrice().toString());
+            response.setTotalPrice(String.valueOf(application.getTotalPrice().intValue()));
             response.setTransactionId(application.getTransactionId());
             response.setWeight(application.getWeight());
             response.setWidth(application.getWidth());
