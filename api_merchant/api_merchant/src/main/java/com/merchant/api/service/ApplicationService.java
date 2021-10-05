@@ -107,10 +107,11 @@ public class ApplicationService {
             application.setStatus(Status.NEW_REQUEST);
             applicationRepo.save(application);
             // set param untuk request ke api empower submission
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             Map<String, Object> empowerParam = new HashMap<>();
             empowerParam.put("orderId", application.getOrderId());
-            empowerParam.put("expiredTime", application.getExpiredTime());
-            empowerParam.put("consentTimeStamp", application.getConsentTimeStamp());
+            empowerParam.put("expiredTime", sdf.format(application.getExpiredTime()));
+            empowerParam.put("consentTimeStamp", sdf.format(application.getConsentTimeStamp()));
 
             AdditionalInfo additionalInfo = new AdditionalInfo();
             additionalInfo.setCustomerRegistrationTime(new Date(new Date().getTime() - (158 * 60 * 60 * 1000)));
@@ -125,8 +126,8 @@ public class ApplicationService {
             Map<String, Object> empowerAddInfo = new HashMap<>();
             empowerAddInfo.put("offerCode", additionalInfo.getOfferCode());
             empowerAddInfo.put("userId", additionalInfo.getUserId());
-            empowerAddInfo.put("otpVerifiedTime", additionalInfo.getOtpVerificationTime());
-            empowerAddInfo.put("customerRegistrationTime", additionalInfo.getCustomerRegistrationTime());
+            empowerAddInfo.put("otpVerifiedTime", sdf.format(additionalInfo.getOtpVerificationTime()));
+            empowerAddInfo.put("customerRegistrationTime", sdf.format(additionalInfo.getCustomerRegistrationTime()));
             empowerAddInfo.put("numberOfTransaction", additionalInfo.getNumberOfTransaction());
             empowerAddInfo.put("volumeOfTransaction", additionalInfo.getVolumeOfTransaction().intValue());
             empowerParam.put("additionalInfo", empowerAddInfo);
@@ -163,7 +164,7 @@ public class ApplicationService {
             empowerCustInfo.put("firstName", customerInfo.getFirstName());
             empowerCustInfo.put("lastName", customerInfo.getLastName());
             empowerCustInfo.put("birthplaceCode", customerInfo.getBirthplaceCode());
-            empowerCustInfo.put("dateOfBirth", customerInfo.getDateOfBirth());
+            empowerCustInfo.put("dateOfBirth", sdf.format(customerInfo.getDateOfBirth()));
             empowerCustInfo.put("genderType", customerInfo.getGenderType());
             empowerCustInfo.put("motherName", customerInfo.getMotherName());
             empowerCustInfo.put("lastEducation", customerInfo.getLastEducation());
