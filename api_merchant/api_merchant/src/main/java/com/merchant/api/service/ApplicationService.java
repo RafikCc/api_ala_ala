@@ -299,6 +299,8 @@ public class ApplicationService {
             String statusItem) {
         String result = "success";
         try {
+            app.setStatus(Status.RETURN);
+            applicationRepo.save(app);
             items.stream().map((data) -> {
                 OrderItems item = new OrderItems();
                 item = findOrderItemByApplicationAndItemId(app.getAppId(), data.getItemId());
