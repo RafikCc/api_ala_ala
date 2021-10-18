@@ -50,6 +50,8 @@ public class RequestFilter extends OncePerRequestFilter {
                 log.debug("Unable to get JWT Token for {}", username);
             } catch (ExpiredJwtException eje) {
                 log.debug("JWT Token has expired for {}", username);
+            } catch (Exception e) {
+                log.debug("Error JWT");
             }
         } else {
             log.warn("JWT Token is null");

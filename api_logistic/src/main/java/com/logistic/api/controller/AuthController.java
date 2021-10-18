@@ -5,6 +5,7 @@ import com.logistic.api.payload.request.AuthRequest;
 import com.logistic.api.payload.response.AuthResponse;
 import com.logistic.api.service.UserService;
 import com.logistic.api.util.JwtTokenUtil;
+import io.jsonwebtoken.SignatureException;
 import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +70,8 @@ public class AuthController {
             throw new BadCredentialsException("INVALID_CREDENTIALS");
         } catch (InternalAuthenticationServiceException e) {
             throw new NullPointerException("USER_NOT_FOUND");
+        } catch (SignatureException se) {
+            throw new SignatureException("TOKEN_INVALID");
         }
 
         UserDetails userDetails = userService.loadUserByUsername(request.getUsername());
