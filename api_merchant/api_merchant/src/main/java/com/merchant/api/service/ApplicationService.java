@@ -96,7 +96,7 @@ public class ApplicationService {
     @Autowired
     private RelativeContactRepo relativeContactRepo;
 
-    public String saveAll(ApplicationReq request) {
+    public String saveAll(ApplicationReq request, String action) {
         try {
             String result = "Success";
             Application application = new Application();
@@ -276,14 +276,16 @@ public class ApplicationService {
             relativeContactRepo.saveAll(contacts);
             empowerParam.put("relativeContact", paramContacts);
             log.debug("param empower : {}", new Gson().toJson(empowerParam));
-            // hit api empower application submission
-            EmpowerApiService apiService = new EmpowerApiService();
-            String token = apiService.getToken("empower", "empower123", 
-                    "http://localhost:8083/api/v1/authenticate");
-            ResponseEntity res = apiService
-                    .excute("http://localhost:8083/api/v1/applications", new Gson().toJson(empowerParam), 
-                            HttpMethod.POST, String.class, new ErrorResponse(), token);
-            log.debug("response empower : {}", res);
+            if(action.equalsIgnoreCase("NEW_DATA")) {
+                // hit api empower application submission
+                EmpowerApiService apiService = new EmpowerApiService();
+                String token = apiService.getToken("empower", "empower123", 
+                        "http://localhost:8083/api/v1/authenticate");
+                ResponseEntity res = apiService
+                        .excute("http://localhost:8083/api/v1/applications", new Gson().toJson(empowerParam), 
+                                HttpMethod.POST, String.class, new ErrorResponse(), token);
+                log.debug("response empower : {}", res);
+            }
 
             return result;
         } catch (Exception e) {
