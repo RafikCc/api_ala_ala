@@ -55,6 +55,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 @Service
@@ -96,7 +97,7 @@ public class ApplicationService {
     @Autowired
     private RelativeContactRepo relativeContactRepo;
 
-    public String saveAll(ApplicationReq request, String action) {
+    public ResponseEntity<?> saveAll(ApplicationReq request, String action) {
         try {
             String result = "Success";
             Application application = new Application();
@@ -287,9 +288,9 @@ public class ApplicationService {
                 log.debug("response empower : {}", res);
             }
 
-            return result;
+            return new ResponseEntity(empowerParam, HttpStatus.CREATED);
         } catch (Exception e) {
-            return e.getMessage();
+            return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
