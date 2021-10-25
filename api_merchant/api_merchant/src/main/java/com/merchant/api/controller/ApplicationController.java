@@ -37,7 +37,7 @@ public class ApplicationController {
     private ApplicationService service;
 
     @ApiOperation(value = "tambah data ke merchant dan empower API", response = String.class)
-    @PostMapping(value = "/new-data", produces = {"application/json"})
+    @PostMapping(value = "/test/new-data", produces = {"application/json"})
     public ResponseEntity<?> postNewData(
             @ApiParam(value = "Application Rrequest", required = true)
             @RequestBody(required = true) ApplicationReq request) {
