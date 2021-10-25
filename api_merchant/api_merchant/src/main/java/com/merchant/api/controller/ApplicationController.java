@@ -37,32 +37,32 @@ public class ApplicationController {
     private ApplicationService service;
 
     @ApiOperation(value = "tambah data ke merchant dan empower API", response = String.class)
-    @PostMapping(value = "/test/new-data", produces = {"application/json"})
+    @PostMapping(value = "/new-data", produces = {"application/json"})
     public ResponseEntity<?> postNewData(
             @ApiParam(value = "Application Rrequest", required = true)
             @RequestBody(required = true) ApplicationReq request) {
 
-        String result = service.saveAll(request, "NEW_DATA");
+        ResponseEntity result = service.saveAll(request, "ADD_DATA");
         log.debug("result : {}", result);
-        if(Objects.nonNull(result) && result.equalsIgnoreCase("success")) {
-                return new ResponseEntity("{\"message\":\"successfully saved.\"}", HttpStatus.OK); 
+        if(result.getStatusCode().equals(HttpStatus.CREATED)) {
+                return new ResponseEntity(result.getBody(), HttpStatus.OK); 
         } else {
-                return new ResponseEntity("{\"message\":\""+result+"\"}", HttpStatus.INTERNAL_SERVER_ERROR);
+                return new ResponseEntity(result.getBody(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     
     @ApiOperation(value = "tambah data ke merchant", response = String.class)
-    @PostMapping(value = "/test/add-data", produces = {"application/json"})
+    @PostMapping(value = "/add-data", produces = {"application/json"})
     public ResponseEntity<?> addData(
             @ApiParam(value = "Application Rrequest", required = true)
             @RequestBody(required = true) ApplicationReq request) {
 
-        String result = service.saveAll(request, "ADD_DATA");
+        ResponseEntity result = service.saveAll(request, "NEW_DATA");
         log.debug("result : {}", result);
-        if(Objects.nonNull(result) && result.equalsIgnoreCase("success")) {
-                return new ResponseEntity("{\"message\":\"successfully saved.\"}", HttpStatus.OK); 
+        if(result.getStatusCode().equals(HttpStatus.CREATED)) {
+                return new ResponseEntity(result.getBody(), HttpStatus.OK); 
         } else {
-                return new ResponseEntity("{\"message\":\""+result+"\"}", HttpStatus.INTERNAL_SERVER_ERROR);
+                return new ResponseEntity(result.getBody(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
