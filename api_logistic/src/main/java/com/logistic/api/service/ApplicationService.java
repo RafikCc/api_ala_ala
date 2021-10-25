@@ -148,6 +148,7 @@ public class ApplicationService {
                 historyRepository.save(history);
                 break;
             default:
+                history.setHistory("Barang diterima pembeli.");
                 break;
         }
         
