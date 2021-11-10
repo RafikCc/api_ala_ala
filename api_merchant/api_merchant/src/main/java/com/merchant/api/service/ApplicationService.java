@@ -54,6 +54,7 @@ import com.merchant.api.repository.RelativeContactRepo;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -96,6 +97,24 @@ public class ApplicationService {
 
     @Autowired
     private RelativeContactRepo relativeContactRepo;
+    
+    @Value("${protokol.url.empower}")
+    private String empowerProtokol;
+    
+    @Value("${address.url.empower}")
+    private String empowerAddress;
+    
+    @Value("${port.url.empower}")
+    private String empowerPort;
+    
+    // private final String urlAuth = empowerProtokol + "://"+ empowerAddress +":"+ empowerPort +"/api/v1/authenticate";
+    // private final String urlSubmission = empowerProtokol + "://"+ empowerAddress +":"+ empowerPort +"/api/v1/applications";
+    private String urlAuth() {
+        return empowerProtokol + "://"+ empowerAddress +":"+ empowerPort +"/api/v1/authenticate";
+    }
+    private String urlSubmission() {
+        return empowerProtokol + "://"+ empowerAddress +":"+ empowerPort +"/api/v1/applications";
+    }
 
     public ResponseEntity<?> saveAll(ApplicationReq request, String action) {
         try {
@@ -281,9 +300,9 @@ public class ApplicationService {
                 // hit api empower application submission
                 EmpowerApiService apiService = new EmpowerApiService();
                 String token = apiService.getToken("empower", "empower123", 
-                        "http://localhost:8083/api/v1/authenticate");
+                        urlAuth());
                 ResponseEntity res = apiService
-                        .excute("http://localhost:8083/api/v1/applications", new Gson().toJson(empowerParam), 
+                        .excute(urlSubmission(), new Gson().toJson(empowerParam), 
                                 HttpMethod.POST, String.class, new ErrorResponse(), token);
                 log.debug("response empower : {}", res);
             }

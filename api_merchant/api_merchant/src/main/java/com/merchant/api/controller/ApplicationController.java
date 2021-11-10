@@ -22,7 +22,10 @@ import com.merchant.api.service.ApplicationService;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -35,6 +38,11 @@ public class ApplicationController {
 
     @Autowired
     private ApplicationService service;
+    
+    @Value("${address.url.empower}")
+    private String merchantAddress;
+    @Value("${port.url.empower}")
+    private String merchantPort;
 
     @ApiOperation(value = "tambah data ke merchant dan empower API", response = String.class)
     @PostMapping(value = "/test/new-data", produces = {"application/json"})
@@ -69,7 +77,10 @@ public class ApplicationController {
     @ApiOperation(value = "test API online with auth", response = String.class)
     @GetMapping(value = "/test/online")
     public ResponseEntity<String> getOnline() {
-        return ResponseEntity.ok("You are online");
+        Map<String, Object> res = new HashMap<>();
+        res.put("message", "API is ready.");
+        res.put("url_empower", merchantAddress + " " + merchantPort);
+        return new ResponseEntity(res, HttpStatus.OK);
     }
 
     @ApiOperation(value = "update data trx")
