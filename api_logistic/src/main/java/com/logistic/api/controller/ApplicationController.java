@@ -17,10 +17,13 @@ import com.logistic.api.service.ApplicationService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -45,10 +48,19 @@ public class ApplicationController {
     @Autowired
     private ApplicationService applicationService;
     
+    @Value("${address.url.empower}")
+    private String merchantAddress;
+    @Value("${port.url.empower}")
+    private String merchantPort;
+    
     @ApiOperation(value = "Test online with auth", response = String.class)
     @GetMapping(value = "/test-online", produces = {"application/json"})
     public ResponseEntity<String> testOnline() {
-        return new ResponseEntity("{\"message\": \"API is online.\"}", HttpStatus.OK);
+        log.debug("url merchant : {}", merchantAddress);
+        Map<String, Object> res = new HashMap<>();
+        res.put("message", "API is ready.");
+        res.put("url_empower", merchantAddress + " " + merchantPort);
+        return new ResponseEntity(res, HttpStatus.OK);
     }
     
     @ApiOperation(value = "request new pick up", response = PickupResponse.class)
